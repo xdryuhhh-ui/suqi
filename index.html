@@ -1,0 +1,1030 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Suqi سوقي</title>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Suqi - سوقي","applicationCategory":"BusinessApplication","operatingSystem":"Windows 7, Windows 10","description":"برنامج كاشير ونقاط بيع للمحلات: قاعدة بيانات للمنتجات، جرد، ورديات، تقارير أرباح، وتسجيل دخول للأدمن.","offers":{"@type":"Offer","price":"999","priceCurrency":"EGP","availability":"https://schema.org/InStock"},"inLanguage":"ar"}</script>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=Lalezar&display=swap">
+<style>
+/* Layout: dark POS storefront. Hero = animated cashier window; bento features; two-card pricing view. Amber on deep blue-green ink. */
+:root {
+  --bg: #091015;
+  --surface: #0f1920;
+  --surface-2: #14222b;
+  --line: #1f313b;
+  --fg: #e9f0f3;
+  --muted: #8ea3ad;
+  --accent: #ff8a2a;
+  --accent-ink: #1a0d02;
+  --good: #4fd1a5;
+  --soon: #6cb6ff;
+  --warn: #ff8a6b;
+  --font-display: "Lalezar", "IBM Plex Sans Arabic", Tahoma, sans-serif;
+  --font-body: "IBM Plex Sans Arabic", Tahoma, "Segoe UI", sans-serif;
+  --font-num: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.7;
+  margin: 0;
+}
+a { color: inherit; text-decoration: none; }
+h1, h2, h3, p { margin: 0; }
+h1, h2, h3 { text-wrap: balance; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+
+#app { position: relative; overflow-x: clip; }
+#app::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 900px; pointer-events: none;
+  background:
+    radial-gradient(600px 360px at 85% 8%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
+    radial-gradient(520px 340px at 10% 22%, color-mix(in srgb, var(--soon) 10%, transparent), transparent 70%);
+}
+#app::after {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 760px; pointer-events: none;
+  background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 56px 56px; opacity: .22;
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 85%); mask-image: linear-gradient(to bottom, #000, transparent 85%);
+}
+.in-wrap {
+  position: relative; z-index: 1; max-width: 1160px; margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* header */
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.top .in-wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 12px; }
+.logo { display: flex; align-items: baseline; gap: 8px; }
+.logo b { font-family: var(--font-display); font-weight: 400; font-size: 30px; line-height: 1; letter-spacing: .5px; }
+.logo b i { font-style: normal; color: var(--accent); }
+.logo span { font-size: 15px; font-weight: 700; color: #fff; }
+nav { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+nav a.l { padding: 6px 12px; border-radius: 999px; color: var(--muted); font-size: 15px; transition: color .2s, background .2s; }
+nav a.l:hover, nav a.l.on { color: var(--fg); background: var(--surface-2); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font: 700 16px/1 var(--font-body); padding: 14px 24px; border-radius: 12px; border: 1px solid transparent;
+  cursor: pointer; transition: transform .2s, box-shadow .2s, background .2s;
+}
+.btn.pri { background: var(--accent); color: var(--accent-ink); box-shadow: 0 8px 28px -10px color-mix(in srgb, var(--accent) 70%, transparent); }
+.btn.pri:hover { transform: translateY(-2px); box-shadow: 0 14px 34px -10px color-mix(in srgb, var(--accent) 80%, transparent); }
+.btn.ghost { background: transparent; color: var(--fg); border-color: var(--line); }
+.btn.ghost:hover { background: var(--surface-2); }
+.btn.sm { padding: 10px 18px; font-size: 14px; }
+.btn[aria-disabled="true"] { background: var(--surface-2); color: var(--muted); cursor: not-allowed; box-shadow: none; transform: none; }
+
+/* hero */
+.hero { display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center; padding-block: 72px 88px; }
+.hero > * { min-width: 0; }
+.tag {
+  display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line)); padding: 4px 14px; border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+.tag::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+h1.big { font-family: var(--font-display); font-weight: 400; font-size: clamp(44px, 7vw, 84px); line-height: 1.12; margin-top: 20px; }
+h1.big em { font-style: normal; color: var(--accent); position: relative; white-space: nowrap; }
+h1.big em svg { position: absolute; inset-inline: 0; bottom: -8px; width: 100%; height: 14px; overflow: visible; }
+h1.big em path { stroke: var(--accent); stroke-width: 4; fill: none; stroke-linecap: round; stroke-dasharray: 260; stroke-dashoffset: 260; animation: draw 1.1s .6s ease forwards; }
+.lead { color: var(--muted); font-size: 18px; max-width: 34em; margin-top: 22px; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+.teaser { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-top: 28px; color: var(--muted); font-size: 15px; }
+.teaser strong { font-family: var(--font-num); color: var(--fg); font-size: 22px; }
+.teaser s { font-family: var(--font-num); }
+.teaser .n { font-family: var(--font-num); }
+.teaser .u { font-family: var(--font-body); font-size: 15px; color: var(--muted); font-weight: 500; }
+
+/* cashier window */
+.win { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; box-shadow: 0 40px 80px -30px #000, 0 0 0 1px color-mix(in srgb, var(--fg) 4%, transparent); }
+.bar { display: flex; align-items: center; gap: 7px; padding: 12px 14px; border-bottom: 1px solid var(--line); background: var(--surface-2); }
+.bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+.bar span { margin-inline-start: auto; font-size: 12px; color: var(--muted); }
+
+/* sections */
+section { padding-block: 84px; }
+.eyebrow { font-size: 14px; color: var(--accent); letter-spacing: .04em; }
+h2.h { font-family: var(--font-display); font-weight: 400; font-size: clamp(34px, 5vw, 54px); line-height: 1.2; margin-top: 10px; max-width: 16em; }
+.sub { color: var(--muted); max-width: 36em; margin-top: 14px; font-size: 17px; }
+
+.bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-top: 44px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 26px; display: flex; flex-direction: column; gap: 20px; min-width: 0; transition: border-color .3s, transform .3s; overflow: hidden; }
+.card:hover { border-color: color-mix(in srgb, var(--accent) 50%, var(--line)); transform: translateY(-4px); }
+.c-db { grid-column: span 4; } .c-speed { grid-column: span 2; } .c-inv { grid-column: span 3; } .c-admin { grid-column: span 3; }
+.card h3 { font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.card h3 svg { width: 24px; height: 24px; stroke: var(--accent); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.card p { color: var(--muted); font-size: 15px; }
+.viz { margin-top: auto; }
+
+
+.race { display: flex; flex-direction: column; gap: 10px; }
+.track { height: 8px; border-radius: 99px; background: var(--surface-2); overflow: hidden; position: relative; }
+.track::after { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 38%; border-radius: 99px; background: linear-gradient(90deg, transparent, var(--accent)); animation: sweep 1.6s cubic-bezier(.6,0,.2,1) infinite; }
+.track:nth-child(2)::after { animation-delay: .25s; width: 30%; } .track:nth-child(3)::after { animation-delay: .5s; width: 46%; }
+
+
+.login { background: var(--surface-2); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 10px; max-width: 320px; }
+.fld { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; align-items: center; }
+.fld b { font-family: var(--font-num); letter-spacing: 3px; color: var(--fg); font-weight: 500; }
+.caret { display: inline-block; width: 2px; height: 14px; background: var(--accent); vertical-align: middle; animation: blink 1s steps(1) infinite; }
+.ok { background: var(--accent); color: var(--accent-ink); border-radius: 10px; padding: 10px; text-align: center; font-weight: 700; font-size: 14px; }
+
+/* screens */
+.shot { margin-top: 44px; }
+.shot .win { max-width: 880px; margin-inline: auto; }
+
+.heroshot .win { animation: float 7s ease-in-out infinite; }
+.crop { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--bg); }
+.crop img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.crop.wide { aspect-ratio: 16 / 8; }
+.crop.wide img { object-position: 50% 62%; }
+.c-inv .crop.wide img { object-position: 50% 8%; }
+.tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 14px; margin-bottom: 4px; scrollbar-width: thin; }
+.tab { flex: none; font: 500 14px/1 var(--font-body); color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 10px 16px; cursor: pointer; transition: color .2s, background .2s, border-color .2s; }
+.tab:hover { color: var(--fg); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+.tab.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; }
+.viewer img { transition: opacity .25s; aspect-ratio: 1400 / 900; }
+.mode { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; color: var(--muted); font-size: 14px; flex-wrap: wrap; }
+.mbtn { font: 700 14px/1 var(--font-body); color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 9px 18px; cursor: pointer; transition: color .2s, background .2s, border-color .2s; }
+.mbtn:hover { color: var(--fg); }
+.mbtn.on { color: var(--accent); background: var(--surface-2); border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); }
+.viewer img.swap { opacity: 0; }
+.cap { text-align: center; color: var(--muted); margin-top: 16px; font-size: 16px; min-height: 1.7em; }
+.compat { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.compat span { font-size: 13px; color: var(--muted); border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 4px 12px; }
+.offer { display: flex; align-items: center; gap: 12px; margin-top: 20px; padding: 12px 16px; border-radius: 14px; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); background: color-mix(in srgb, var(--accent) 9%, transparent); color: var(--fg); font-size: 15px; max-width: 34em; }
+.offer b { color: var(--accent); }
+.offer::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: var(--accent); flex: none; }
+.offer-box { max-width: 880px; margin: 28px auto 0; justify-content: center; text-align: center; font-size: 16px; }
+.later-note { display: block; font-size: 14px; color: var(--soon); }
+a.later-note { font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
+.more { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 32px 28px; margin-top: 64px; }
+.more > div { border-top: 1px solid var(--line); padding-top: 18px; }
+.more h3 { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.more h3::before { content: ""; width: 8px; height: 8px; background: var(--accent); border-radius: 2px; flex: none; }
+.more p { color: var(--muted); font-size: 15px; margin-top: 6px; }
+@media (max-width: 900px) { .more { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .more { grid-template-columns: 1fr; margin-top: 44px; } }
+
+/* soon */
+.soon { display: grid; grid-template-columns: 1fr 340px; gap: 56px; align-items: center; background: linear-gradient(160deg, var(--surface), color-mix(in srgb, var(--soon) 7%, var(--surface))); border: 1px solid var(--line); border-radius: 28px; padding: 48px; }
+.soon > * { min-width: 0; }
+.badge { display: inline-block; font-size: 13px; font-weight: 700; color: var(--soon); background: color-mix(in srgb, var(--soon) 13%, transparent); border: 1px solid color-mix(in srgb, var(--soon) 35%, transparent); padding: 3px 12px; border-radius: 99px; }
+.phone { width: 230px; margin-inline: auto; border: 2px solid var(--line); border-radius: 34px; padding: 14px; background: var(--bg); box-shadow: 0 30px 60px -28px #000; animation: float 6s ease-in-out infinite; }
+.phone .scr { background: var(--surface); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-height: 330px; }
+.phone small { color: var(--muted); font-size: 11px; }
+.phone .n { font-family: var(--font-num); font-size: 26px; color: var(--fg); line-height: 1.1; }
+.bars { display: flex; align-items: flex-end; gap: 7px; height: 120px; margin-top: auto; }
+.bars i { flex: 1; background: linear-gradient(to top, color-mix(in srgb, var(--soon) 30%, var(--surface)), var(--soon)); border-radius: 5px 5px 2px 2px; height: var(--h); transform-origin: bottom; animation: rise 1.2s ease both; }
+.bars i:nth-child(2) { animation-delay: .1s; } .bars i:nth-child(3) { animation-delay: .2s; } .bars i:nth-child(4) { animation-delay: .3s; } .bars i:nth-child(5) { animation-delay: .4s; } .bars i:nth-child(6) { animation-delay: .5s; } .bars i:nth-child(7) { animation-delay: .6s; }
+
+section[id] { scroll-margin-top: 76px; }
+.steps { list-style: none; counter-reset: st; margin: 40px 0 32px; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.steps li { counter-increment: st; position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 26px 26px 26px 26px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.steps li::before { content: counter(st); width: 38px; height: 38px; border-radius: 12px; background: var(--accent); color: var(--accent-ink); font: 700 18px/38px var(--font-num); text-align: center; margin-bottom: 8px; }
+.steps b { font-size: 20px; }
+.steps span { color: var(--muted); font-size: 15px; }
+@media (max-width: 800px) { .steps { grid-template-columns: 1fr; } }
+.faq { margin-top: 36px; max-width: 880px; display: flex; flex-direction: column; gap: 10px; }
+.faq details { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 0 20px; transition: border-color .25s; }
+.faq details[open] { border-color: color-mix(in srgb, var(--accent) 50%, var(--line)); }
+.faq summary { cursor: pointer; list-style: none; padding: 18px 0; font-weight: 700; font-size: 17px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; font: 500 24px/1 var(--font-num); color: var(--accent); flex: none; transition: transform .25s; }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq p { color: var(--muted); padding-bottom: 18px; max-width: 46em; }
+.wa-float { position: fixed; z-index: 40; left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: inline-flex; align-items: center; gap: 8px; padding: 12px 18px 12px 14px; border-radius: 999px; background: #25d366; color: #052e16; font-weight: 700; font-size: 15px; box-shadow: 0 10px 30px -8px rgba(37,211,102,.55); transition: transform .2s, box-shadow .2s; }
+.wa-float:hover { transform: translateY(-3px); box-shadow: 0 16px 36px -8px rgba(37,211,102,.7); }
+.wa-float svg { width: 22px; height: 22px; fill: currentColor; }
+.lb { position: fixed; inset: 0; z-index: 60; background: color-mix(in srgb, #000 88%, transparent); display: grid; place-items: center; padding: 64px 72px 28px; cursor: zoom-out; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.lb[hidden] { display: none; }
+.lb-fig { margin: 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 12px; cursor: default; }
+.lb img { max-width: 100%; max-height: calc(100vh - 150px); height: auto; border-radius: 12px; box-shadow: 0 30px 80px -20px #000; }
+.lb figcaption { color: var(--muted); font-size: 15px; text-align: center; }
+.lb-x, .lb-nav { position: absolute; width: 46px; height: 46px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); font: 500 26px/1 var(--font-body); cursor: pointer; display: grid; place-items: center; transition: background .2s, border-color .2s; }
+.lb-x:hover, .lb-nav:hover { background: var(--surface-2); border-color: color-mix(in srgb, var(--accent) 50%, var(--line)); }
+.lb-x { top: calc(14px + env(safe-area-inset-top, 0px)); right: 16px; }
+.lb-nav { top: 50%; translate: 0 -50%; }
+.lb-nav[hidden] { display: none; }
+.lb-prev { right: 16px; }
+.lb-next { left: 16px; }
+.viewer img, .heroshot img { cursor: zoom-in; }
+.foot { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 28px; align-items: start; padding-block: 36px; }
+.foot > * { min-width: 0; }
+.foot-brand b { display: block; font-family: var(--font-display); font-weight: 400; font-size: 28px; color: var(--fg); line-height: 1.1; }
+.foot-links { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.foot-links a { color: var(--muted); transition: color .2s; }
+.foot-links a:hover { color: var(--accent); }
+.foot-contact { display: flex; flex-direction: column; gap: 2px; }
+.foot-contact b { font-family: var(--font-num); font-weight: 500; font-size: 20px; color: var(--fg); user-select: all; }
+.foot-copy { grid-column: 1 / -1; font-size: 13px; border-top: 1px solid var(--line); padding-top: 16px; }
+@media (max-width: 720px) { .foot { grid-template-columns: 1fr; } .wa-float span { display: none; } .wa-float { padding: 14px; } }
+.final { text-align: center; padding-block: 60px 96px; }
+.final h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(34px, 5.5vw, 60px); line-height: 1.2; text-wrap: balance; }
+.final .cta-row { justify-content: center; }
+
+/* pricing view */
+.p-head { text-align: center; padding-block: 72px 24px; }
+.p-head h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(42px, 6vw, 72px); line-height: 1.15; }
+.p-head p { color: var(--muted); font-size: 18px; margin-top: 12px; }
+.plans { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; max-width: 880px; margin: 36px auto 0; padding-bottom: 40px; }
+.plan { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 26px; padding: 34px; display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.plan.main { border-color: color-mix(in srgb, var(--accent) 60%, var(--line)); background: linear-gradient(170deg, color-mix(in srgb, var(--accent) 9%, var(--surface)), var(--surface) 55%); box-shadow: 0 30px 70px -34px color-mix(in srgb, var(--accent) 45%, transparent); }
+.plan.later { opacity: .94; }
+.plan header { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.plan h2 { font-size: 22px; font-weight: 700; }
+.save { font-size: 13px; font-weight: 700; color: var(--accent-ink); background: var(--accent); padding: 3px 12px; border-radius: 99px; }
+.price { display: flex; flex-direction: column; gap: 2px; }
+.price .old { font-family: var(--font-num); color: var(--muted); font-size: 20px; }
+.price .old s { text-decoration-color: var(--warn); text-decoration-thickness: 2px; }
+.price .now { display: flex; align-items: baseline; gap: 10px; }
+.price .now b { font-family: var(--font-display); font-weight: 400; font-size: 76px; line-height: 1; letter-spacing: 1px; }
+.plan.main .price .now b { color: var(--accent); }
+.price .now span { font-size: 20px; color: var(--muted); }
+.ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 13px; }
+.ul li { display: flex; gap: 12px; align-items: flex-start; font-size: 16px; }
+.ul svg { width: 20px; height: 20px; flex: none; margin-top: 4px; stroke: var(--good); fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.ul li.soonli svg { stroke: var(--soon); }
+.ul li.soonli { color: var(--fg); }
+.ul li.also { color: var(--muted); }
+.plan .btn { margin-top: auto; width: 100%; padding-block: 16px; }
+.fine { text-align: center; color: var(--muted); font-size: 14px; padding-bottom: 80px; }
+
+.groups { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; margin-top: 44px; }
+.gcard { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 26px; min-width: 0; transition: border-color .3s; }
+.gcard:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+.g-sell, .g-money { grid-column: span 3; }
+.g-stock, .g-safe, .g-cust { grid-column: span 2; }
+.gcard h3 { font-size: 20px; font-weight: 700; padding-bottom: 14px; margin-bottom: 6px; border-bottom: 1px solid var(--line); }
+.gl { list-style: none; margin: 0; padding: 0; }
+.gl li { display: flex; flex-direction: column; padding-block: 12px; border-bottom: 1px dashed var(--line); }
+.gl li:last-child { border-bottom: 0; padding-bottom: 0; }
+.gl b { font-size: 16px; font-weight: 700; }
+.gl span { color: var(--muted); font-size: 14px; }
+@media (max-width: 900px) { .g-sell, .g-money, .g-stock, .g-safe, .g-cust { grid-column: span 6; } }
+
+.plist { max-width: 880px; margin: 0 auto; padding-block: 16px 56px; }
+.plist h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(30px, 4.5vw, 44px); line-height: 1.2; margin-top: 8px; }
+.pl { list-style: none; counter-reset: n; margin: 28px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; }
+.pl li { counter-increment: n; position: relative; display: flex; flex-direction: column; padding: 14px 44px 14px 0; border-bottom: 1px solid var(--line); min-width: 0; }
+.pl li::before { content: counter(n); position: absolute; inset-inline-start: auto; right: 0; top: 14px; width: 30px; height: 30px; border-radius: 8px; background: var(--surface-2); color: var(--soon); font: 500 13px/30px var(--font-num); text-align: center; }
+.pl b { font-size: 16px; font-weight: 700; }
+.pl span { color: var(--muted); font-size: 14px; }
+@media (max-width: 720px) { .pl { grid-template-columns: 1fr; } }
+
+
+footer { border-top: 1px solid var(--line); }
+footer .in-wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-block: 28px; color: var(--muted); font-size: 14px; }
+
+#toast {
+  position: fixed; inset-inline: 0; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); margin-inline: auto; width: max-content; max-width: calc(100% - 32px);
+  background: var(--surface-2); border: 1px solid var(--line); color: var(--fg); padding: 12px 20px; border-radius: 12px; font-size: 15px;
+  opacity: 0; transform: translateY(16px); pointer-events: none; transition: opacity .3s, transform .3s; z-index: 50;
+}
+#toast.show { opacity: 1; transform: none; }
+
+/* motion */
+.reveal { transform: translateY(26px); transition: transform .8s cubic-bezier(.2,.7,.2,1); }
+.reveal.in { transform: none; }
+.hero .rise { animation: up .8s cubic-bezier(.2,.7,.2,1) both; }
+.hero .rise:nth-child(2) { animation-delay: .08s; } .hero .rise:nth-child(3) { animation-delay: .16s; } .hero .rise:nth-child(4) { animation-delay: .24s; } .hero .rise:nth-child(5) { animation-delay: .32s; }
+/* extra motion */
+.js .reveal { opacity: 0; transform: translateY(34px) scale(.985); transition: opacity .75s ease, transform .85s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
+.js .reveal.in { opacity: 1; transform: none; }
+main:not([hidden]) { animation: viewin .55s ease both; }
+.heroshot .win { position: relative; }
+.heroshot .win::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, transparent 38%, color-mix(in srgb, #fff 9%, transparent) 50%, transparent 62%); transform: translateX(-120%); animation: shine 6s 1.5s ease-in-out infinite; }
+.hero .btn.pri { animation: glow 3.2s ease-in-out infinite; }
+.ticker { position: relative; z-index: 1; border-block: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 60%, transparent); overflow: hidden; direction: ltr; }
+.ticker .track-t { display: flex; width: max-content; animation: tick 38s linear infinite; }
+.ticker:hover .track-t { animation-play-state: paused; }
+.ticker span { direction: rtl; flex: none; padding: 16px 28px; font-size: 16px; color: var(--muted); display: flex; align-items: center; gap: 28px; white-space: nowrap; }
+.ticker span::after { content: ""; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); transform: rotate(45deg); }
+.card.spot, .gcard.spot, .plan.later.spot { background-image: radial-gradient(280px circle at var(--mx, -400px) var(--my, -400px), color-mix(in srgb, var(--accent) 13%, transparent), transparent 70%); }
+@keyframes viewin { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes shine { 0%, 55% { transform: translateX(-120%); } 85%, 100% { transform: translateX(120%); } }
+@keyframes glow { 50% { box-shadow: 0 10px 40px -6px color-mix(in srgb, var(--accent) 75%, transparent); } }
+@keyframes tick { to { transform: translateX(-50%); } }
+@keyframes up { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes pulse { 50% { box-shadow: 0 0 0 6px transparent; opacity: .55; } }
+@keyframes sweep { 0% { transform: translateX(120%); } 100% { transform: translateX(-380%); } }
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes float { 50% { transform: translateY(-10px); } }
+@keyframes rise { from { transform: scaleY(0); } }
+
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; padding-block: 48px 64px; gap: 40px; }
+  .c-db, .c-speed, .c-inv, .c-admin { grid-column: span 6; }
+  .soon { grid-template-columns: 1fr; padding: 30px 22px; gap: 36px; }
+  section { padding-block: 60px; }
+}
+@media (max-width: 640px) {
+  .plans { grid-template-columns: 1fr; }
+  .plan { padding: 26px 22px; }
+  .logo span { display: none; }
+  nav a.l.hide-sm { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  h1.big em path { stroke-dashoffset: 0; }
+  .reveal { transform: none; }
+}
+
+/* ---- polish layer ---- */
+.skip { position: absolute; inset-inline-start: 16px; top: -120px; z-index: 100; background: var(--accent); color: var(--accent-ink); padding: 10px 16px; border-radius: 10px; font-weight: 700; transition: top .2s; }
+.skip:focus { top: 12px; }
+.progress { position: fixed; top: 0; inset-inline: 0; height: 3px; z-index: 35; background: linear-gradient(90deg, var(--accent), #ffc08a); transform-origin: right center; transform: scaleX(0); pointer-events: none; }
+.pic { display: block; width: 100%; height: auto; }
+.mt16 { margin-top: 16px; } .mt20 { margin-top: 20px; } .mt24 { margin-top: 24px; }
+.teaser.center, .cta-row.center { justify-content: center; }
+.viewer img:focus-visible, .heroshot img:focus-visible { border-radius: 12px; }
+nav a.l.on { color: var(--fg); background: var(--surface-2); }
+.plan .btn:disabled, .btn[aria-disabled="true"] { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .progress { transition: none; } }
+.contact { max-width: 880px; margin: 0 auto; padding-block: 8px 80px; text-align: center; }
+.contact h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(30px, 4.5vw, 44px); line-height: 1.3; margin-top: 8px; }
+</style>
+
+<div id="app" dir="rtl" lang="ar">
+  <a class="skip" href="#features">تخطي للمميزات</a>
+  <div class="progress" aria-hidden="true"></div>
+
+  <header class="top">
+    <div class="in-wrap">
+      <a href="#home" class="logo" aria-label="Suqi - الصفحة الرئيسية"><b>Suq<i>i</i></b><span>سوقي</span></a>
+      <nav aria-label="القائمة الرئيسية">
+        <a class="l hide-sm" href="#features">المميزات</a>
+        <a class="l hide-sm" href="#screens">من جوا البرنامج</a>
+        <a class="l hide-sm" href="#faq">الأسئلة</a>
+        <a class="l" id="nav-pricing" href="#pricing">الأسعار</a>
+        <a class="btn pri sm" href="#pricing">اطلب البرنامج</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ========== HOME ========== -->
+  <main id="view-home">
+    <div class="in-wrap">
+      <div class="hero">
+        <div>
+          <span class="tag rise">برنامج كاشير ونقاط بيع للمحلات</span>
+          <h1 class="big rise">الكاشير اللي <em>مش بيعطّلك<svg viewBox="0 0 200 14" preserveAspectRatio="none" aria-hidden="true"><path d="M2 9 C 50 2, 120 2, 198 8"/></svg></em></h1>
+          <p class="lead rise">Suqi برنامج بيخلّي محلك يبيع أسرع: قاعدة بيانات لكل منتجاتك، جرد للمخزون، وتسجيل دخول آمن للأدمن. وكل بيانات المحل على جهازك.</p>
+          <div class="cta-row rise">
+            <a class="btn pri" href="#pricing">شوف الأسعار</a>
+            <a class="btn ghost" href="#features">اعرف المميزات</a>
+          </div>
+          <div class="teaser rise"><span>السعر الحالي</span><strong><span class="n">999</span> <span class="u">جنيه</span></strong><span>بدل</span><s><span class="n">1500</span> <span class="u">جنيه</span></s></div>
+          <div class="compat rise" aria-label="التوافق">
+            <span>Windows 7</span><span>Windows 10</span><span>يشتغل على الأجهزة الضعيفة</span><span>تحميل وتسليم أونلاين</span>
+          </div>
+          <p class="offer rise"><span>أول 10 يشتروا البرنامج بياخدوا <b>Suqi Premium (1500 جنيه) مجاناً</b> لما تنزل.</span></p>
+        </div>
+
+        <div class="rise heroshot">
+          <div class="win">
+            <div class="bar"><i></i><i></i><i></i><span>سوقي - نظرة عامة</span></div>
+            <img src="img/dark-overview.webp" fetchpriority="high" width="1400" height="900" alt="شاشة نظرة عامة في برنامج سوقي" decoding="async" class="pic" tabindex="0" role="button" aria-label="تكبير اللقطة">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ticker" aria-hidden="true">
+      <div class="track-t">
+        <span>بيع بالباركود</span><span>جرد المخزون</span><span>عملاء وديون</span><span>مشتريات وموردون</span><span>تقارير ذكية</span><span>صلاحية ورواكد</span><span>ويندوز 7 و 10</span><span>للأجهزة الضعيفة</span><span>نسخ احتياطي</span><span>تقفيل الوردية</span>
+        <span>بيع بالباركود</span><span>جرد المخزون</span><span>عملاء وديون</span><span>مشتريات وموردون</span><span>تقارير ذكية</span><span>صلاحية ورواكد</span><span>ويندوز 7 و 10</span><span>للأجهزة الضعيفة</span><span>نسخ احتياطي</span><span>تقفيل الوردية</span>
+      </div>
+    </div>
+
+    <section id="features">
+      <div class="in-wrap">
+        <div class="reveal">
+          <div class="eyebrow">المميزات</div>
+          <h2 class="h">كل اللي محتاجه المحل في برنامج واحد</h2>
+          <p class="sub">من أول تسجيل المنتج لحد قفل الفاتورة، كل خطوة متظبطة عشان توفر وقتك ووقت الزبون.</p>
+        </div>
+
+        <div class="bento">
+          <article class="card c-db reveal">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>قاعدة بيانات للمنتجات</h3>
+            <p>سجّل منتجاتك بأسعارها وكمياتها في مكان واحد، وابحث عن أي منتج في ثواني وقت البيع.</p>
+            <div class="viz crop wide"><img src="img/dark-products.webp" width="1400" height="900" loading="lazy" decoding="async" alt="شاشة المنتجات في سوقي"></div>
+          </article>
+
+          <article class="card c-speed reveal">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>سرعة في التشغيل</h3>
+            <p>البرنامج يفتح ويضرب الفاتورة بسرعة، فالزبون مش بيستنى والطابور بيمشي.</p>
+            <div class="viz race" aria-hidden="true"><div class="track"></div><div class="track"></div><div class="track"></div></div>
+          </article>
+
+          <article class="card c-inv reveal">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>الجرد</h3>
+            <p>اعرف الكمية المتاحة من كل منتج وراجع المخزون من غير ما تعدّ بإيدك.</p>
+            <div class="viz crop wide"><img src="img/dark-inventory.webp" width="1400" height="900" loading="lazy" decoding="async" alt="شاشة المخزون والجرد في سوقي"></div>
+          </article>
+
+          <article class="card c-admin reveal">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>تسجيل دخول للأدمن</h3>
+            <p>حساب خاص بالأدمن بكلمة مرور، عشان إعدادات المحل وبياناته تفضل في إيدك.</p>
+            <div class="viz login" aria-hidden="true">
+              <div class="fld"><span>اسم المستخدم</span><b>admin</b></div>
+              <div class="fld"><span>كلمة المرور</span><b>••••••<span class="caret"></span></b></div>
+              <div class="ok">دخول</div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="screens">
+      <div class="in-wrap">
+        <div class="reveal">
+          <div class="eyebrow">من جوا البرنامج</div>
+          <h2 class="h">شاشات واضحة وسهلة على أي حد في المحل</h2>
+        </div>
+        <div class="shot reveal">
+          <div class="mode" role="group" aria-label="مظهر البرنامج">
+            <span>مظهر البرنامج</span>
+            <button class="mbtn on" type="button" data-mode="dark" aria-pressed="true">داكن</button>
+            <button class="mbtn" type="button" data-mode="light" aria-pressed="false">نهاري</button>
+          </div>
+          <div class="tabs" role="tablist" aria-label="شاشات البرنامج">
+            <button class="tab on" role="tab" aria-selected="true" data-i="0">نظرة عامة</button>
+            <button class="tab" role="tab" aria-selected="false" data-i="1">نقطة البيع</button>
+            <button class="tab" role="tab" aria-selected="false" data-i="2">المنتجات</button>
+            <button class="tab" role="tab" aria-selected="false" data-i="3">المخزون والجرد</button>
+            <button class="tab" role="tab" aria-selected="false" data-i="4">المشتريات والموردون</button>
+            <button class="tab" role="tab" aria-selected="false" data-i="5">العملاء والديون</button>
+            <button class="tab" role="tab" aria-selected="false" data-i="6">الصلاحية والرواكد</button>
+            <button class="tab" role="tab" aria-selected="false" data-i="7">التقارير الذكية</button>
+            <button class="tab" role="tab" aria-selected="false" data-i="8">تحليل المبيعات</button>
+            <button class="tab" role="tab" aria-selected="false" data-i="9">الأرباح والوردية</button>
+            <button class="tab" role="tab" aria-selected="false" data-i="10">سجل النشاط</button>
+            <button class="tab" role="tab" aria-selected="false" data-i="11">الفواتير والمرتجعات</button>
+            <button class="tab" role="tab" aria-selected="false" data-i="12">الإعدادات والصلاحيات</button>
+          </div>
+          <div class="win viewer" id="v-panel" role="tabpanel">
+            <div class="bar"><i></i><i></i><i></i><span id="v-title">سوقي - نظرة عامة</span></div>
+            <img id="v-img" src="img/dark-overview.webp" width="1400" height="900" alt="شاشة نظرة عامة في برنامج سوقي" decoding="async" class="pic" tabindex="0" role="button" aria-label="تكبير اللقطة">
+          </div>
+          <p class="cap" id="v-cap">ملخص المحل في لمحة: الأصناف، مبيعات اليوم، التنبيهات، وآخر الفواتير.</p>
+        </div>
+
+        <div class="more reveal">
+          <div><h3>بيع بالباركود</h3><p>امسح الباركود أو ابحث بالاسم، والبيع والخصم يتسجلوا كحركة مخزون.</p></div>
+          <div><h3>مشتريات وموردون</h3><p>سجّل فواتير الشراء وأرصدة الموردين في نفس البرنامج.</p></div>
+          <div><h3>عملاء وديون</h3><p>دفتر حساب لكل عميل: مبيعات آجلة وتحصيلات.</p></div>
+          <div><h3>صلاحية ورواكد</h3><p>تنبيه للدفعات القريبة الانتهاء والأصناف اللي مش بتتباع.</p></div>
+          <div><h3>تقارير ذكية</h3><p>اقتراح قائمة مشتريات بناءً على متوسط مبيعاتك، وتصدير CSV.</p></div>
+          <div><h3>تحميل وتسليم أونلاين</h3><p>تحميل البرنامج وتسليمه بيتم أونلاين بالكامل.</p></div>
+          <div><h3>هدية أول 10 مشتركين</h3><p>أول 10 يشتروا البرنامج بياخدوا Suqi Premium (1500 جنيه) مجاناً لما تنزل.</p></div>
+          <div><h3>ويندوز 7 و 10</h3><p>بيشتغل على ويندوز 7 وويندوز 10 من غير ما تغيّر نظام جهازك.</p></div>
+          <div><h3>للأجهزة الضعيفة</h3><p>خفيف على الجهاز، فبيشتغل كويس حتى على الأجهزة القديمة والضعيفة.</p></div>
+          <div><h3>بياناتك على جهازك</h3><p>الباقة الأساسية محلية بالكامل ومش بتزامن بيانات المحل على الإنترنت. المزامنة السحابية في Suqi Premium بس.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="all">
+      <div class="in-wrap">
+        <div class="reveal">
+          <div class="eyebrow">وكمان كتير</div>
+          <h2 class="h">تفاصيل بتفرق في شغل المحل كل يوم</h2>
+          <p class="sub">من تقفيل الوردية لحد النسخ الاحتياطي، كل حاجة بتحتاجها موجودة جوا البرنامج.</p>
+        </div>
+        <div class="groups">
+          <article class="gcard g-sell reveal">
+            <h3>البيع والكاشير</h3>
+            <ul class="gl">
+              <li><b>تعليق الفاتورة</b><span>سيب فاتورة مفتوحة وخدم عميل تاني، وكمّلها بعدين.</span></li>
+              <li><b>أصناف بالوزن وباركود الميزان</b><span>مناسب للبقالة والخضار واللحوم.</span></li>
+              <li><b>وحدات متعددة</b><span>قطعة وكرتونة ودستة، بسعر جملة وسعر قطاعي.</span></li>
+              <li><b>الأكثر مبيعاً على الشاشة</b><span>اختصار للكاشير بدل البحث كل مرة.</span></li>
+              <li><b>إيصال بشعار المحل</b><span>للطابعة الحرارية بمقاس 58 و80 مم.</span></li>
+              <li><b>QR للدفع على الإيصال</b><span>للمحافظ الإلكترونية وإنستاباي.</span></li>
+            </ul>
+          </article>
+          <article class="gcard g-money reveal">
+            <h3>الأرباح والحسابات</h3>
+            <ul class="gl">
+              <li><b>تقرير الأرباح</b><span>ربح كل صنف وكل يوم.</span></li>
+              <li><b>مصاريف المحل</b><span>إيجار وكهرباء ومرتبات، وصافي الربح الحقيقي.</span></li>
+              <li><b>تقفيل اليومية والوردية</b><span>قارن النقدية الفعلية بالمفروض وكشف العجز.</span></li>
+              <li><b>تقارير حسب الكاشير والساعة والفئة</b><span>اعرف أوقات الذروة والأكتر مبيعاً.</span></li>
+              <li><b>الفاتورة الإلكترونية لمصلحة الضرائب</b><span>للمحلات اللي محتاجاها.</span></li>
+            </ul>
+          </article>
+          <article class="gcard g-stock reveal">
+            <h3>المنتجات والمخزون</h3>
+            <ul class="gl">
+              <li><b>استيراد المنتجات من Excel</b><span>ضيف مئات الأصناف مرة واحدة.</span></li>
+              <li><b>طباعة ملصقات الباركود</b><span>للأصناف اللي مالهاش باركود.</span></li>
+              <li><b>ورقة جرد وتسوية الفروقات</b><span>اطبع الورقة وسجّل الفرق بسببه.</span></li>
+            </ul>
+          </article>
+          <article class="gcard g-safe reveal">
+            <h3>الأمان والتحكم</h3>
+            <ul class="gl">
+              <li><b>نسخ احتياطي تلقائي</b><span>بيانات المحل متتضيعش لو الجهاز باظ.</span></li>
+              <li><b>سجل النشاط</b><span>مين خصم، مين لغى فاتورة، مين عدّل سعر.</span></li>
+              <li><b>صلاحيات تفصيلية للكاشير</b><span>الخصم والإلغاء وتعديل السعر للمدير بس.</span></li>
+            </ul>
+          </article>
+          <article class="gcard g-cust reveal">
+            <h3>العملاء</h3>
+            <ul class="gl">
+              <li><b>الفاتورة والتذكير على واتساب</b><span>ابعت الفاتورة وذكّر العميل بالمديونية.</span></li>
+              <li><b>حد أقصى لدين العميل</b><span>تحذير قبل ما تبيع آجل فوق الحد.</span></li>
+              <li><b>نقاط ولاء</b><span>للزباين الثابتين.</span></li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="in-wrap">
+        <div class="soon reveal">
+          <div>
+            <span class="badge">قريباً</span>
+            <h2 class="h mt16">Suqi Premium: تحكم في محلك من تليفونك</h2>
+            <p class="sub">هتشوف مبيعاتك وتتحكم في البرنامج من موبايلك وانت في أي مكان، ومعاها 20 ميزة زيادة على الباقة الأساسية.</p>
+            <div class="cta-row"><a class="btn ghost" href="#pricing">شوف مميزات Premium</a></div>
+          </div>
+          <div class="phone" aria-hidden="true">
+            <div class="scr">
+              <small>مبيعات النهارده</small>
+              <div class="n">3,480 ج</div>
+              <div class="bars">
+                <i style="--h:38%"></i><i style="--h:56%"></i><i style="--h:44%"></i><i style="--h:72%"></i><i style="--h:60%"></i><i style="--h:88%"></i><i style="--h:68%"></i>
+              </div>
+              <small>مثال توضيحي</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="how">
+      <div class="in-wrap">
+        <div class="reveal">
+          <div class="eyebrow">ازاي تبدأ</div>
+          <h2 class="h">من أول مكالمة لحد أول فاتورة في 3 خطوات</h2>
+        </div>
+        <ol class="steps reveal">
+          <li><b>اتصل واتس اب</b><span>كلمنا على الرقم واتس اب واطلب الباقة الأساسية (999 جنيه).</span></li>
+          <li><b>استلم البرنامج</b><span>التحميل والتسليم بيتم أونلاين بالكامل بعد ما تتفق معانا.</span></li>
+          <li><b>حمّل وابدأ</b><span>التحميل والتسليم أونلاين. ثبّت البرنامج، أنشئ حساب المدير، وضيف أصنافك.</span></li>
+        </ol>
+        <div class="cta-row reveal"><a class="btn pri" href="#pricing">شوف الأسعار</a></div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <div class="in-wrap">
+        <div class="reveal">
+          <div class="eyebrow">الأسئلة الشائعة</div>
+          <h2 class="h">اللي بيسأل عنه أصحاب المحلات</h2>
+        </div>
+        <div class="faq reveal">
+          <details><summary>هل البرنامج محتاج إنترنت؟</summary><p>لا. الباقة الأساسية بتشتغل من غير إنترنت وبيانات المحل محفوظة على جهازك. الإنترنت محتاجه بس وقت تحميل البرنامج.</p></details>
+          <details><summary>هيشتغل على جهازي القديم؟</summary><p>البرنامج بيدعم ويندوز 7 وويندوز 10، ومناسب للأجهزة الضعيفة.</p></details>
+          <details><summary>ازاي هستلم البرنامج؟</summary><p>التحميل والتسليم أونلاين بالكامل، بعد ما تكلمنا على واتساب وتتفق معانا.</p></details>
+          <details><summary>لو الجهاز باظ، بياناتي بتضيع؟</summary><p>في نسخ احتياطي تلقائي لبيانات المحل، فتقدر ترجّعها على الجهاز الجديد.</p></details>
+          <details><summary>بيطبع إيصال على الطابعة الحرارية؟</summary><p>أيوه، الإيصال بيطبع بشعار المحل على الطابعة الحرارية بمقاس 58 أو 80 مم.</p></details>
+          <details><summary>أقدر أدّي الكاشير صلاحيات محدودة؟</summary><p>أيوه. تقدر تمنع الكاشير من الخصم أو الإلغاء أو تعديل السعر، وتخلي ده للمدير بس. وكل عملية متسجلة في سجل النشاط.</p></details>
+          <details><summary>ايه الفرق بين الباقة الأساسية وSuqi Premium؟</summary><p>Suqi Premium جاية قريب بـ1500 جنيه، وفيها التحكم من الموبايل ومتابعة المبيعات من أي مكان و20 ميزة زيادة. أول 10 مشتركين في الباقة الأساسية بياخدوها مجاناً لما تنزل.</p></details>
+          <details><summary>ازاي أطلب البرنامج؟</summary><p>اتصل على الرقم واتس اب، أو اضغط على زر واتساب اللي تحت على الشمال.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <div class="in-wrap">
+      <div class="final reveal">
+        <h2>جاهز تشغّل محلك على Suqi؟</h2>
+        <div class="teaser center"><strong><span class="n">999</span> <span class="u">جنيه</span></strong><span>بدل</span><s><span class="n">1500</span> <span class="u">جنيه</span></s></div>
+        <div class="cta-row"><a class="btn pri" href="#pricing">شوف الأسعار</a></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========== PRICING ========== -->
+  <main id="view-pricing" hidden>
+    <div class="in-wrap">
+      <div class="p-head">
+        <div class="eyebrow">الأسعار</div>
+        <h1>خطة واضحة وسعر واحد</h1>
+        <p>الباقة الأساسية متاحة دلوقتي، وSuqi Premium جاية قريب.</p>
+      </div>
+
+      <p class="offer offer-box"><span>عرض أول 10 مشتركين: بياخدوا <b>Suqi Premium (1500 جنيه) مجاناً</b> لما تنزل.</span></p>
+
+      <div class="plans">
+        <article class="plan main">
+          <header><h2>Suqi الأساسية</h2><span class="save">وفّر 501 جنيه</span></header>
+          <div class="price">
+            <div class="old"><s><span class="n">1500</span> <span class="u">جنيه</span></s></div>
+            <div class="now"><b>999</b><span>جنيه</span></div>
+          </div>
+          <ul class="ul">
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>قاعدة بيانات للمنتجات</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>سرعة في التشغيل</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>جرد المخزون</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>تسجيل دخول للأدمن</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>يدعم ويندوز 7 و 10 والأجهزة الضعيفة</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>التحميل والتسليم أونلاين</li>
+            <li class="soonli"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>أول 10 مشتركين: Suqi Premium مجاناً لما تنزل</li>
+          </ul>
+          <a class="btn pri" id="buy" href="https://wa.me/201227870493?text=%D8%B9%D8%A7%D9%8A%D8%B2%20%D8%A3%D8%B7%D9%84%D8%A8%20%D8%A8%D8%B1%D9%86%D8%A7%D9%85%D8%AC%20Suqi" target="_blank" rel="noopener">اطلب البرنامج دلوقتي</a>
+        </article>
+
+        <article class="plan later">
+          <header><h2>Suqi Premium</h2><span class="badge">قريباً</span></header>
+          <div class="price">
+            <div class="old">&nbsp;</div>
+            <div class="now"><b>1500</b><span>جنيه</span></div>
+          </div>
+          <ul class="ul">
+            <li class="also"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>كل مميزات الخطة الأساسية</li>
+            <li class="soonli"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>تتحكم في البرنامج من تليفونك</li>
+            <li class="soonli"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>تشوف المبيعات من أي مكان</li>
+            <li class="soonli"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>20 ميزة زيادة، تحت في القايمة الكاملة</li>
+          </ul>
+          <a class="later-note" href="#premium-list" id="to-list">شوف الـ20 ميزة ↓</a>
+          <p class="later-note">مجاناً لأول 10 يشتروا الباقة الأساسية.</p>
+          <button class="btn" type="button" aria-disabled="true" id="soon-btn">متاحة قريباً</button>
+        </article>
+      </div>
+      <p class="fine">السعر 999 جنيه عرض لفترة محدودة بدل 1500 جنيه.</p>
+
+      <section class="plist" id="premium-list" aria-labelledby="pl-h">
+        <div class="eyebrow">Suqi Premium</div>
+        <h2 id="pl-h">20 ميزة مش موجودة في الباقة الأساسية</h2>
+        <ol class="pl">
+          <li><b>متابعة المبيعات لحظة بلحظة</b><span>شوف مبيعات المحل من الموبايل وانت في أي مكان.</span></li>
+          <li><b>إشعارات فورية</b><span>على الفواتير الكبيرة والخصومات والإلغاء.</span></li>
+          <li><b>مزامنة سحابية ونسخ احتياطي</b><span>بيانات المحل متتضيعش لو الجهاز اتسرق أو باظ.</span></li>
+          <li><b>تعديل الأسعار وإضافة المنتجات من الموبايل</b><span>من غير ما تروح المحل.</span></li>
+          <li><b>موافقة المدير عن بعد</b><span>على الخصم والإلغاء من تليفونك.</span></li>
+          <li><b>أكتر من فرع في لوحة واحدة</b><span>شوف كل فروعك مرة واحدة.</span></li>
+          <li><b>أكتر من جهاز كاشير متزامنين</b><span>نفس البيانات على كل الأجهزة.</span></li>
+          <li><b>مسح الباركود بكاميرا الموبايل</b><span>لإضافة صنف أو البحث عنه.</span></li>
+          <li><b>جرد من الموبايل</b><span>عدّ البضاعة وانت ماشي بين الرفوف.</span></li>
+          <li><b>تنبيه المخزون المنخفض والصلاحية</b><span>يوصلك على الموبايل.</span></li>
+          <li><b>تقرير يومي تلقائي</b><span>ملخص مبيعات وأرباح اليوم على واتساب أو الإيميل.</span></li>
+          <li><b>رسوم بيانية للمبيعات والأرباح</b><span>تشوف الاتجاه من نظرة.</span></li>
+          <li><b>مقارنة الفروع والفترات</b><span>الأسبوع ده قصاد اللي فات، وفرع قصاد فرع.</span></li>
+          <li><b>توقع المبيعات والمخزون</b><span>يقترح تطلب كام من كل صنف.</span></li>
+          <li><b>طلب بضاعة من الموردين من الموبايل</b><span>القايمة تتبعت لهم واتساب.</span></li>
+          <li><b>كتالوج منتجات أونلاين</b><span>برابط تشاركه مع الزباين.</span></li>
+          <li><b>طلبات التوصيل وتتبع المندوبين</b><span>تابع كل طلب لحد ما يوصل.</span></li>
+          <li><b>حضور وانصراف الموظفين</b><span>سجّل مواعيد شغل كل موظف.</span></li>
+          <li><b>استعادة نسخة احتياطية عن بعد</b><span>رجّع بيانات المحل من أي مكان.</span></li>
+          <li><b>أولوية في الدعم الفني</b><span>ردنا عليك بيبقى الأول.</span></li>
+        </ol>
+      </section>
+
+      <section class="contact" id="contact" aria-labelledby="contact-h">
+        <div class="eyebrow">للتواصل</div>
+        <h2 id="contact-h">للتواصل اتصل على الرقم واتس اب</h2>
+        <div class="cta-row center mt20"><a class="btn pri" href="https://wa.me/201227870493?text=%D8%B9%D8%A7%D9%8A%D8%B2%20%D8%A3%D8%B7%D9%84%D8%A8%20%D8%A8%D8%B1%D9%86%D8%A7%D9%85%D8%AC%20Suqi" target="_blank" rel="noopener">افتح واتساب</a></div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="in-wrap foot">
+      <div class="foot-brand"><b>Suqi</b><span>سوقي: برنامج كاشير ونقاط بيع للمحلات</span></div>
+      <nav class="foot-links" aria-label="روابط سريعة">
+        <a href="#features">المميزات</a><a href="#screens">من جوا البرنامج</a><a href="#faq">الأسئلة</a><a href="#pricing">الأسعار</a>
+      </nav>
+      <div class="foot-contact"><span>للتواصل اتصل على الرقم واتس اب</span></div>
+      <div class="foot-copy">© 2026 جميع الحقوق محفوظة</div>
+    </div>
+  </footer>
+
+  <a class="wa-float" href="https://wa.me/201227870493?text=%D8%B9%D8%A7%D9%8A%D8%B2%20%D8%A3%D8%B7%D9%84%D8%A8%20%D8%A8%D8%B1%D9%86%D8%A7%D9%85%D8%AC%20Suqi" target="_blank" rel="noopener" aria-label="تواصل معنا على واتساب">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5A11 11 0 0 0 3.2 17.3L2 22l4.8-1.2A11 11 0 1 0 20.5 3.5Zm-8.4 17a9 9 0 0 1-4.6-1.3l-.3-.2-2.8.7.8-2.7-.2-.3a9 9 0 1 1 7.1 3.8Zm5-6.7c-.3-.1-1.6-.8-1.9-.9-.3-.1-.5-.1-.7.1l-.9 1.1c-.2.2-.3.2-.6.1a7.3 7.3 0 0 1-3.6-3.1c-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5l-.9-2.1c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.800 11.800 0 0 0 4.500 4c1.700.7 2.400.8 3.200.7a2.700 2.700 0 0 0 1.800-1.300 2.200 2.200 0 0 0 .2-1.300c-.1-.1-.3-.2-.6-.3Z"/></svg>
+    <span>واتساب</span>
+  </a>
+  <div id="lb" class="lb" hidden role="dialog" aria-modal="true" aria-label="عرض اللقطة بحجم أكبر">
+    <button class="lb-x" id="lb-x" type="button" aria-label="إغلاق">×</button>
+    <button class="lb-nav lb-prev" id="lb-prev" type="button" aria-label="اللقطة اللي قبلها">›</button>
+    <figure class="lb-fig">
+      <img id="lb-img" alt="">
+      <figcaption id="lb-cap"></figcaption>
+    </figure>
+    <button class="lb-nav lb-next" id="lb-next" type="button" aria-label="اللقطة اللي بعدها">‹</button>
+  </div>
+  <div id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var doc = document.documentElement;
+  var app = document.getElementById("app");
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  var $ = function (s) { return document.querySelector(s); };
+  var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+  var byId = function (id) { return document.getElementById(id); };
+
+  app.classList.add("js");
+
+  /* ---------- toast ---------- */
+  var toast = byId("toast"), toastTimer = 0;
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.classList.remove("show"); }, 3000);
+  }
+
+  function scrollToEl(el) {
+    el.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+  }
+
+  /* ---------- routing: two views, hash driven ---------- */
+  var ROUTES = { home: "home", features: "home", screens: "home", how: "home", faq: "home", pricing: "pricing", "premium-list": "pricing" };
+  var homeView = byId("view-home"), pricingView = byId("view-pricing"), navPricing = byId("nav-pricing");
+  var navLinks = $$("nav a.l");
+
+  function route() {
+    var h = decodeURIComponent(location.hash.slice(1)) || "home";
+    var view = Object.prototype.hasOwnProperty.call(ROUTES, h) ? ROUTES[h] : "home";
+    var isPricing = view === "pricing";
+    homeView.hidden = isPricing;
+    pricingView.hidden = !isPricing;
+    navPricing.classList.toggle("on", isPricing);
+    if (isPricing) runCounts();
+    var isSection = Object.prototype.hasOwnProperty.call(ROUTES, h) && h !== "home" && h !== "pricing";
+    var target = isSection ? byId(h) : null;
+    if (target) { scrollToEl(target); } else { window.scrollTo(0, 0); }
+  }
+  window.addEventListener("hashchange", route);
+
+  /* ---------- scroll spy for the nav ---------- */
+  var activeId = "";
+  function setActive(id) {
+    activeId = id;
+    navLinks.forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (href === "#pricing") return;
+      a.classList.toggle("on", href === "#" + id);
+    });
+  }
+  if ("IntersectionObserver" in window) {
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) setActive(en.target.id);
+        else if (en.target.id === activeId) setActive("");
+      });
+    }, { rootMargin: "-45% 0px -50% 0px" });
+    ["features", "screens", "faq"].forEach(function (id) { var el = byId(id); if (el) spy.observe(el); });
+  }
+
+  /* ---------- scroll progress ---------- */
+  var bar = $(".progress"), queued = false;
+  function paintProgress() {
+    queued = false;
+    var total = Math.max(doc.scrollHeight, document.body.scrollHeight);
+    var max = total - window.innerHeight;
+    bar.style.transform = "scaleX(" + (max > 0 ? Math.min(1, window.scrollY / max) : 0) + ")";
+  }
+  function queueProgress() { if (!queued) { queued = true; requestAnimationFrame(paintProgress); } }
+  window.addEventListener("scroll", queueProgress, { passive: true });
+  window.addEventListener("resize", queueProgress);
+
+  /* ---------- buy / premium buttons ---------- */
+  byId("soon-btn").addEventListener("click", function () { showToast("Suqi Premium لسه مش متاحة، هتتفتح قريباً"); });
+
+  /* ---------- accessible tabs (arrows, Home, End, roving focus) ---------- */
+  function bindTabs(tabs, select) {
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener("click", function () { select(i); });
+      tab.addEventListener("keydown", function (e) {
+        var rtl = app.dir === "rtl", n = -1;
+        if (e.key === "ArrowRight") n = (i + (rtl ? -1 : 1) + tabs.length) % tabs.length;
+        else if (e.key === "ArrowLeft") n = (i + (rtl ? 1 : -1) + tabs.length) % tabs.length;
+        else if (e.key === "Home") n = 0;
+        else if (e.key === "End") n = tabs.length - 1;
+        if (n < 0) return;
+        e.preventDefault();
+        select(n);
+        tabs[n].focus();
+      });
+    });
+  }
+
+  /* ---------- screenshot gallery ---------- */
+  var SHOTS = [
+    ["overview", "نظرة عامة", "ملخص المحل في لمحة: الأصناف، مبيعات اليوم، التنبيهات، وآخر الفواتير."],
+    ["pos", "نقطة البيع", "امسح الباركود أو ابحث عن الصنف، علّق الفاتورة، واستخدم الأكثر مبيعاً. وكل بيع بيتسجل كحركة مخزون."],
+    ["products", "المنتجات", "باركود وسعر بيع وتكلفة وفئة وكمية وحالة لكل صنف، مع استيراد من Excel وطباعة ملصق باركود."],
+    ["inventory", "المخزون والجرد", "رصيد كل صنف مع تمييز الأصناف المنخفضة، وقيمة المخزون بالتكلفة، وطباعة ورقة جرد."],
+    ["purchases", "المشتريات والموردون", "استلام فاتورة الشراء بيضيف الكمية ويسجل التكلفة وصلاحية الدفعة."],
+    ["customers", "العملاء والديون", "دفتر حساب للعملاء: تحصيلات ومبيعات آجلة، حد للدين، نقاط ولاء، وتذكير على واتساب."],
+    ["expiry", "الصلاحية والرواكد", "تابع الدفعات القريبة الانتهاء والأصناف الراكدة اللي مفيش عليها حركة بيع."],
+    ["reports", "التقارير الذكية", "قائمة مشتريات مقترحة بناءً على متوسط البيع، مع تصدير CSV وعروض وخصومات."],
+    ["analytics", "تحليل المبيعات", "المبيعات والربح حسب الكاشير وساعة اليوم وفئة الصنف."],
+    ["profit", "الأرباح والوردية", "ربح الأصناف بعد تكلفة الشراء، مصاريف المحل، وتقفيل الوردية بمقارنة النقدية الفعلية بالمفروض."],
+    ["audit", "سجل النشاط", "كل عملية متسجلة باسم المستخدم ووقتها: مين باع، خصم، لغى فاتورة أو عدّل سعر."],
+    ["sales", "الفواتير والمرتجعات", "راجع المبيعات، اطبع إيصال أي فاتورة، وأرجع الفاتورة كاملة للمخزون."],
+    ["settings", "الإعدادات والصلاحيات", "بيانات المحل، حسابات المستخدمين وصلاحياتهم، والنسخ الاحتياطي."]
+  ];
+  var HAS_DARK = { pos: false, settings: false };
+  var gallery = { mode: "dark", index: 0 };
+  var shotTabs = $$(".tab"), modeBtns = $$(".mbtn");
+  var vImg = byId("v-img"), vPanel = byId("v-panel"), vTitle = byId("v-title"), vCap = byId("v-cap");
+  var swapToken = 0, swapTimer = 0;
+
+  shotTabs.forEach(function (t, i) { t.id = "shot-tab-" + i; t.setAttribute("aria-controls", "v-panel"); });
+
+  function pickFor(i) {
+    var key = SHOTS[i][0];
+    var mode = (gallery.mode === "dark" && HAS_DARK[key] === false) ? "light" : gallery.mode;
+    return { src: "img/" + mode + "-" + key + ".webp", fallback: mode !== gallery.mode };
+  }
+  function markTabs(i) {
+    shotTabs.forEach(function (t, k) {
+      var on = k === i;
+      t.classList.toggle("on", on);
+      t.setAttribute("aria-selected", String(on));
+      t.tabIndex = on ? 0 : -1;
+    });
+    vPanel.setAttribute("aria-labelledby", shotTabs[i].id);
+  }
+  function preloadNeighbours(i) {
+    [-1, 1].forEach(function (d) {
+      var p = new Image();
+      p.src = pickFor((i + d + SHOTS.length) % SHOTS.length).src;
+    });
+  }
+  function showShot(i) {
+    gallery.index = i;
+    var s = SHOTS[i], pick = pickFor(i), token = ++swapToken;
+    markTabs(i);
+    vTitle.textContent = "سوقي - " + s[1];
+    vCap.textContent = s[2] + (pick.fallback ? " (اللقطة بالمظهر النهاري)." : "");
+    vImg.classList.add("swap");
+    clearTimeout(swapTimer);
+    swapTimer = setTimeout(function () {
+      var pre = new Image();
+      pre.onload = function () {
+        if (token !== swapToken) return;
+        vImg.src = pick.src;
+        vImg.alt = "شاشة " + s[1] + " في برنامج سوقي";
+        vImg.classList.remove("swap");
+      };
+      pre.onerror = function () { if (token === swapToken) vImg.classList.remove("swap"); };
+      pre.src = pick.src;
+    }, 140);
+    preloadNeighbours(i);
+  }
+  bindTabs(shotTabs, showShot);
+  modeBtns.forEach(function (b) {
+    b.addEventListener("click", function () {
+      gallery.mode = b.getAttribute("data-mode");
+      modeBtns.forEach(function (x) {
+        var on = x === b;
+        x.classList.toggle("on", on);
+        x.setAttribute("aria-pressed", String(on));
+      });
+      showShot(gallery.index);
+    });
+  });
+  markTabs(0);
+
+  /* ---------- lightbox ---------- */
+  var lb = byId("lb"), lbImg = byId("lb-img"), lbCap = byId("lb-cap");
+  var lbX = byId("lb-x"), lbPrev = byId("lb-prev"), lbNext = byId("lb-next");
+  var lbReturn = null, lbInGallery = false;
+
+  function openLightbox(img, caption, inGallery) {
+    lbReturn = document.activeElement;
+    lbInGallery = inGallery;
+    lbImg.src = img.currentSrc || img.src;
+    lbImg.alt = img.alt;
+    lbCap.textContent = caption;
+    lbPrev.hidden = !inGallery;
+    lbNext.hidden = !inGallery;
+    lb.hidden = false;
+    doc.style.overflow = "hidden";
+    lbX.focus();
+  }
+  function closeLightbox() {
+    if (lb.hidden) return;
+    lb.hidden = true;
+    lbImg.removeAttribute("src");
+    doc.style.overflow = "";
+    if (lbReturn && typeof lbReturn.focus === "function") lbReturn.focus({ preventScroll: true });
+  }
+  function stepLightbox(d) {
+    if (!lbInGallery) return;
+    var n = (gallery.index + d + SHOTS.length) % SHOTS.length;
+    showShot(n);
+    lbImg.src = pickFor(n).src;
+    lbImg.alt = "شاشة " + SHOTS[n][1] + " في برنامج سوقي";
+    lbCap.textContent = SHOTS[n][1];
+  }
+
+  [vImg, $(".heroshot img")].forEach(function (img) {
+    var inGallery = img === vImg;
+    function open() {
+      openLightbox(img, inGallery ? SHOTS[gallery.index][1] : SHOTS[0][1], inGallery);
+    }
+    img.addEventListener("click", open);
+    img.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }
+    });
+  });
+  lbX.addEventListener("click", closeLightbox);
+  lbPrev.addEventListener("click", function () { stepLightbox(-1); });
+  lbNext.addEventListener("click", function () { stepLightbox(1); });
+  lb.addEventListener("click", function (e) {
+    if (e.target === lb || e.target.tagName === "FIGURE") closeLightbox();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (lb.hidden) return;
+    if (e.key === "Escape") { closeLightbox(); return; }
+    if (e.key === "ArrowRight") { stepLightbox(-1); return; }
+    if (e.key === "ArrowLeft") { stepLightbox(1); return; }
+    if (e.key === "Tab") {
+      var f = [lbX, lbPrev, lbNext].filter(function (x) { return !x.hidden; });
+      var idx = f.indexOf(document.activeElement);
+      var nxt = e.shiftKey ? (idx <= 0 ? f.length - 1 : idx - 1) : (idx === f.length - 1 ? 0 : idx + 1);
+      e.preventDefault();
+      f[nxt].focus();
+    }
+  });
+
+  /* ---------- motion ---------- */
+  $$(".bento, .groups, .more, .pl, .plans").forEach(function (g) {
+    Array.prototype.forEach.call(g.children, function (c, i) { c.style.setProperty("--d", (i % 5) * 0.08 + "s"); });
+  });
+
+  if (finePointer && !reduceMotion) {
+    $$(".card, .gcard, .plan.later").forEach(function (c) {
+      c.classList.add("spot");
+      c.addEventListener("pointermove", function (e) {
+        var r = c.getBoundingClientRect();
+        c.style.setProperty("--mx", (e.clientX - r.left) + "px");
+        c.style.setProperty("--my", (e.clientY - r.top) + "px");
+      }, { passive: true });
+    });
+  }
+
+  var counted = false;
+  function runCounts() {
+    if (counted || reduceMotion) return;
+    counted = true;
+    $$(".plan .now b").forEach(function (el) {
+      var to = parseInt(el.textContent, 10), start = null;
+      el.textContent = "0";
+      function frame(ts) {
+        if (start === null) start = ts;
+        var p = Math.min((ts - start) / 1100, 1), eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = String(Math.round(to * eased));
+        if (p < 1) requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    });
+  }
+
+  var revealEls = $$(".reveal");
+  function settle(el) {
+    setTimeout(function () { el.classList.remove("reveal", "in"); el.style.removeProperty("--d"); }, 1500);
+  }
+  if ("IntersectionObserver" in window && !reduceMotion) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add("in");
+        settle(en.target);
+        io.unobserve(en.target);
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(function (el) { io.observe(el); });
+  } else {
+    revealEls.forEach(function (el) { el.classList.add("in"); });
+  }
+
+  /* ---------- start ---------- */
+  if (location.hash) route();
+  queueProgress();
+})();
+</script>
+
+</body></html>
